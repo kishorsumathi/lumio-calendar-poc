@@ -1,0 +1,30 @@
+[
+  {
+    "id": "bcb564b2-a693-42f3-847e-54f63595a2c8",
+    "userEmail": "kishorbrindha18@gmail.com",
+    "userName": "Kishor G",
+    "title": "Client Technical Sync & Review",
+    "description": "Discuss project requirements, timeline, and deliverables.",
+    "startTime": "2026-08-25T10:00",
+    "endTime": "2026-08-25T11:00",
+    "clientEmail": "kishorbrindha18@gmail.com",
+    "status": "synced",
+    "createdAt": "2026-08-24T16:14:11.581Z",
+    "meetLink": "https://meet.google.com/miw-ttwk-uut",
+    "googleEventId": "joeis7ot3ba6r38e11ouk38lps"
+  },
+  {
+    "id": "6e895ab4-ae25-46f3-9a4b-ce2e934fa71b",
+    "userEmail": "kishorbrindha18@gmail.com",
+    "userName": "Kishor G",
+    "title": "Client Technical Sync & Review",
+    "description": "Discuss project requirements, timeline, and deliverables.",
+    "startTime": "2026-08-24T10:00",
+    "endTime": "2026-08-25T11:00",
+    "clientEmail": "client@example.com",
+    "status": "synced",
+    "createdAt": "2026-08-24T16:08:46.392Z",
+    "meetLink": "https://meet.google.com/zrq-ssxc-rzd",
+    "googleEventId": "8glmb7iggcg3un0njracs307dg"
+  }
+]
