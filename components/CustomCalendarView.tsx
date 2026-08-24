@@ -8,6 +8,23 @@ interface CustomCalendarViewProps {
   events: CustomEvent[];
 }
 
+function formatISTTime(dateStr: string): string {
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
 export function CustomCalendarView({ events }: CustomCalendarViewProps) {
   const [viewMode, setViewMode] = useState<"grid" | "timeline">("grid");
   const [selectedEvent, setSelectedEvent] = useState<CustomEvent | null>(events[0] || null);
@@ -92,7 +109,7 @@ export function CustomCalendarView({ events }: CustomCalendarViewProps) {
           <div>
             <h2 className="text-lg font-bold text-gray-900">Our Custom In-App Calendar</h2>
             <p className="text-xs text-gray-500">
-              Interactive local database calendar view ({events.length} event{events.length === 1 ? "" : "s"})
+              IST Timezone (Asia/Kolkata GMT+5:30) • {events.length} event{events.length === 1 ? "" : "s"}
             </p>
           </div>
         </div>
@@ -125,7 +142,7 @@ export function CustomCalendarView({ events }: CustomCalendarViewProps) {
         <div className="rounded-xl border border-dashed border-gray-200 p-8 text-center">
           <CalendarIcon className="mx-auto h-8 w-8 text-gray-300" />
           <p className="mt-2 text-xs font-semibold text-gray-700">No meetings scheduled yet</p>
-          <p className="text-[11px] text-gray-400">Use the form on the left to create your first meeting.</p>
+          <p className="text-[11px] text-gray-400">Use the form on the left to create your first meeting in IST.</p>
         </div>
       ) : viewMode === "grid" ? (
         <div className="space-y-4">
@@ -227,21 +244,27 @@ export function CustomCalendarView({ events }: CustomCalendarViewProps) {
                 </div>
                 <span className="inline-flex items-center space-x-1 rounded-full bg-green-100 px-2.5 py-0.5 text-[10px] font-semibold text-green-800">
                   <CheckCircle2 className="h-3 w-3 text-green-600" />
-                  <span>Synced to Google</span>
+                  <span>Synced to Google (IST)</span>
                 </span>
               </div>
 
               <div className="mt-3 grid grid-cols-1 gap-2 text-xs text-gray-700 sm:grid-cols-2">
                 <div className="flex items-center space-x-1.5">
-                  <Clock className="h-4 w-4 text-blue-600" />
+                  <Clock className="h-4 w-4 text-blue-600 flex-shrink-0" />
                   <span>
-                    {new Date(selectedEvent.startTime).toLocaleString()} -{" "}
-                    {new Date(selectedEvent.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    <strong className="text-gray-900">Start (IST):</strong> {formatISTTime(selectedEvent.startTime)}
                   </span>
                 </div>
 
                 <div className="flex items-center space-x-1.5">
-                  <User className="h-4 w-4 text-indigo-600" />
+                  <Clock className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                  <span>
+                    <strong className="text-gray-900">End (IST):</strong> {formatISTTime(selectedEvent.endTime)}
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-1.5 sm:col-span-2">
+                  <User className="h-4 w-4 text-indigo-600 flex-shrink-0" />
                   <span>
                     <strong className="text-gray-900">Organizer:</strong> {selectedEvent.userName} ({selectedEvent.userEmail})
                   </span>
@@ -288,8 +311,6 @@ export function CustomCalendarView({ events }: CustomCalendarViewProps) {
         /* Timeline List Mode */
         <div className="space-y-4">
           {events.map((event) => {
-            const startDate = new Date(event.startTime);
-            const endDate = new Date(event.endTime);
             const guests = getGuests(event);
 
             return (
@@ -308,7 +329,7 @@ export function CustomCalendarView({ events }: CustomCalendarViewProps) {
                   {event.status === "synced" && (
                     <span className="inline-flex items-center space-x-1 rounded-full bg-green-100 px-2.5 py-0.5 text-[10px] font-semibold text-green-800">
                       <CheckCircle2 className="h-3 w-3 text-green-600" />
-                      <span>Synced to Google</span>
+                      <span>Synced to Google (IST)</span>
                     </span>
                   )}
                   {event.status === "local_pending" && (
@@ -327,14 +348,14 @@ export function CustomCalendarView({ events }: CustomCalendarViewProps) {
 
                 <div className="mt-3 grid grid-cols-1 gap-2 text-[11px] text-gray-600 sm:grid-cols-2">
                   <div className="flex items-center space-x-1.5">
-                    <Clock className="h-3.5 w-3.5 text-gray-400" />
+                    <Clock className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
                     <span>
-                      {startDate.toLocaleDateString()} {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      <strong className="text-gray-700">Time (IST):</strong> {formatISTTime(event.startTime)} - {formatISTTime(event.endTime)}
                     </span>
                   </div>
 
                   <div className="flex items-center space-x-1.5">
-                    <User className="h-3.5 w-3.5 text-gray-400" />
+                    <User className="h-3.5 w-3.5 text-gray-400 flex-shrink-0" />
                     <span className="font-medium text-gray-700">Organizer:</span> {event.userName} ({event.userEmail})
                   </div>
                 </div>

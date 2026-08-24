@@ -14,6 +14,15 @@ export interface CreateEventInput {
   clientEmails: string[];
 }
 
+function formatISTDateTime(dateTimeStr: string): string {
+  if (!dateTimeStr) return new Date().toISOString();
+  // If input format is "YYYY-MM-DDTHH:mm", format explicitly with +05:30 IST offset
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dateTimeStr)) {
+    return `${dateTimeStr}:00+05:30`;
+  }
+  return new Date(dateTimeStr).toISOString();
+}
+
 export async function createMeetingAction(input: CreateEventInput) {
   const session = await auth();
 
@@ -40,6 +49,8 @@ export async function createMeetingAction(input: CreateEventInput) {
   }
 
   const eventId = uuidv4();
+  const startISO = formatISTDateTime(input.startTime);
+  const endISO = formatISTDateTime(input.endTime);
 
   // STAGE 1: Add to Our Custom In-App Calendar Database First
   const initialCustomEvent: CustomEvent = {
@@ -48,8 +59,8 @@ export async function createMeetingAction(input: CreateEventInput) {
     userName,
     title: input.title,
     description: input.description,
-    startTime: input.startTime,
-    endTime: input.endTime,
+    startTime: startISO,
+    endTime: endISO,
     clientEmails: validClientEmails,
     clientEmail: validClientEmails[0],
     status: "local_pending",
@@ -59,7 +70,7 @@ export async function createMeetingAction(input: CreateEventInput) {
   addCustomEvent(initialCustomEvent);
 
   try {
-    // STAGE 2: Sync to User's Personal Google Calendar
+    // STAGE 2: Sync to User's Personal Google Calendar in IST (Asia/Kolkata)
     const oauth2Client = new google.auth.OAuth2(
       process.env.AUTH_GOOGLE_ID,
       process.env.AUTH_GOOGLE_SECRET
@@ -82,8 +93,14 @@ export async function createMeetingAction(input: CreateEventInput) {
       requestBody: {
         summary: input.title,
         description: input.description,
-        start: { dateTime: new Date(input.startTime).toISOString() },
-        end: { dateTime: new Date(input.endTime).toISOString() },
+        start: {
+          dateTime: startISO,
+          timeZone: "Asia/Kolkata", // Indian Standard Time (IST / GMT+5:30)
+        },
+        end: {
+          dateTime: endISO,
+          timeZone: "Asia/Kolkata", // Indian Standard Time (IST / GMT+5:30)
+        },
         attendees: attendees,
         conferenceData: {
           createRequest: {
